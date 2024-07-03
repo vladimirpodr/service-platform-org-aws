@@ -1,0 +1,5 @@
+role_arn       = "arn:aws:iam::243395836600:role/org-io-prod-shared-services-assume-role"
+bucket         = "org-io-production-tfstate-bucket"
+key            = "production/account/terraform.tfstate"
+region         = "us-east-1"
+dynamodb_table = "org-io-production-tfstate-locks-table"

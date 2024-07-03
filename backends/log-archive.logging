@@ -1,0 +1,5 @@
+role_arn       = "arn:aws:iam::823345141005:role/org-io-logarch-shrdsvc-assume-role"
+bucket         = "org-io-logarch-tfstate-bucket"
+key            = "logarch/logging/terraform.tfstate"
+region         = "us-east-1"
+dynamodb_table = "org-io-logarch-tfstate-locks-table"

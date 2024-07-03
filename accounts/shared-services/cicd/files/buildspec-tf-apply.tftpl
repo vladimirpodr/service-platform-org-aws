@@ -1,0 +1,13 @@
+version: 0.2
+env:
+  secrets-manager:
+    GH_PAT: "${gh_pat_secret_name}:token"
+phases:
+  install:
+    commands:
+      - git clone https://github.com/tfutils/tfenv.git ~/.tfenv
+      - ln -s ~/.tfenv/bin/* /usr/local/bin
+  build:
+    commands:
+      - git config --global url."https://oauth2:$GH_PAT@github.com".insteadOf ssh://git@github.com
+      - ./bin/terraform.sh -e $ENV -c core -a plan

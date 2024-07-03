@@ -1,0 +1,95 @@
+name: Reusable workflow for Terraform Apply action
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+    secrets:
+      AWS_IAM_ROLE_TO_ASSUME_ARN:
+        required: true
+      AWS_REGION:
+        required: true
+      GH_PAT:
+        required: true
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    # These permissions are needed to interact with GitHub's OIDC Token endpoint.
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Git config
+        run: |
+          git config --global url."https://oauth2:${{ secrets.GH_PAT }}@github.com".insteadOf ssh://git@github.com
+
+      - name: Get environment components
+        id: getcomponents
+        run: |
+          cd accounts/${{ inputs.environment }}
+          get_dirs=()
+          for dir in */; do
+            get_dirs+="${dir%?} "
+          done
+          echo "components=${get_dirs}" >> $GITHUB_OUTPUT
+          cd ../../
+
+      # - name: Setup Terraform CLI
+      #   uses: hashicorp/setup-terraform@v2.0.0
+      #   with:
+      #     terraform_version: 1.3.6
+
+      - name: Setup tfenv tool
+        run: |
+          rm /usr/local/bin/terraform
+          git clone https://github.com/tfutils/tfenv.git ~/.tfenv
+          ln -s ~/.tfenv/bin/* /usr/local/bin
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          role-to-assume: ${{ secrets.AWS_IAM_ROLE_TO_ASSUME_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Terraform Plan
+        id: plan
+        run: |
+          BASEDIR=$(pwd)
+          for component in ${{ steps.getcomponents.outputs.components }}
+          do
+            echo "Working with component << ${component} >>!"
+            ./bin/terraform.sh -e ${{ inputs.environment }} -c ${component} -a plan -o ${{ inputs.environment }}.${component}.tfplan
+          done
+        continue-on-error: true
+
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+
+      # - name: Manual approve
+      #   uses: trstringer/manual-approval@v1.5.1
+      #   timeout-minutes: 5
+      #   with:
+      #     secret: ${{ github.TOKEN }}
+      #     minimum-approvals: 1
+      #     approvers: devops
+
+      - name: Terraform Apply
+        id: apply
+        run: |
+          BASEDIR=$(pwd)
+          for component in ${{ steps.getcomponents.outputs.components }}
+          do
+            echo "Working with component << ${component} >>!"
+            ./bin/terraform.sh -e ${{ inputs.environment }} -c ${component} -a apply -o ${{ inputs.environment }}.${component}.tfplan
+          done

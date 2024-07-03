@@ -1,0 +1,5 @@
+role_arn       = "arn:aws:iam::552249246765:role/org-io-network-shrdsvc-assume-role"
+bucket         = "org-io-network-tfstate-bucket"
+key            = "network/account/terraform.tfstate"
+region         = "us-east-1"
+dynamodb_table = "org-io-network-tfstate-locks-table"

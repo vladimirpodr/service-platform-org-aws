@@ -1,0 +1,22 @@
+name: test-networking
+
+on:
+  pull_request:
+    paths:
+      - networking/**
+      - etc/networking.tfvars
+      - etc/global.tfvars
+    branches:
+      - 'main'
+
+  workflow_dispatch:
+
+jobs:
+  call-workflow:
+    uses: ./.github/workflows/test-shared-workflow.yml
+    with:
+      environment: networking
+    secrets:
+      AWS_IAM_ROLE_TO_ASSUME_ARN: ${{ secrets.AWS_IAM_ROLE_TO_ASSUME_ARN }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      GH_PAT: ${{ secrets.GH_PAT }}

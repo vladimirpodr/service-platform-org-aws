@@ -1,0 +1,22 @@
+name: test-log-archive
+
+on:
+  pull_request:
+    paths:
+      - log-archive/**
+      - etc/log-archive.tfvars
+      - etc/global.tfvars
+    branches:
+      - 'main'
+
+  workflow_dispatch:
+
+jobs:
+  call-workflow:
+    uses: ./.github/workflows/test-shared-workflow.yml
+    with:
+      environment: log-archive
+    secrets:
+      AWS_IAM_ROLE_TO_ASSUME_ARN: ${{ secrets.AWS_IAM_ROLE_TO_ASSUME_ARN }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      GH_PAT: ${{ secrets.GH_PAT }}

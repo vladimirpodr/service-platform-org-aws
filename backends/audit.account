@@ -1,0 +1,5 @@
+role_arn       = "arn:aws:iam::428361613096:role/org-io-audit-shrdsvc-assume-role"
+bucket         = "org-io-audit-tfstate-bucket"
+key            = "audit/account/terraform.tfstate"
+region         = "us-east-1"
+dynamodb_table = "org-io-audit-tfstate-locks-table"
