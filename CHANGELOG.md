@@ -79,11 +79,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## 2022-07-20
 ### Added
-- [CLD-26: Deploy codebuild project in Shared account to run future pipelines on it](https://org.atlassian.net/browse/CLD-26)
+- Deploy codebuild project in Shared account to run future pipelines on it
 
 ## 2022-07-19
 ### Added
-- [CLD-7: Establish a codebase for further development](https://org.atlassian.net/browse/CLD-7)
+- Establish a codebase for further development
 
 
 Types of changes:
